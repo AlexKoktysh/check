@@ -19,7 +19,7 @@ import {
 } from "../../constants/index.js";
 import "./main-screen.scss";
 import moment from "moment/moment.js";
-import { setResponseMapper, changeLabel } from "../../use/setResponse.js";
+import { setResponseMapper, changeLabel, getValueLabel } from "../../use/setResponse.js";
 import { changeDate_custom } from "../../use/changeDate.js";
 import {
     changeCommodity,
@@ -50,6 +50,13 @@ function MainScreen() {
     const [labelDeliv, setLabelDeliv] = useState("");
     const [resSteps, setResSteps] = useState(steps);
     const [valueDelivery, setValueDelivery] = useState("");
+    const [currency, setCurrency] = useState(null);
+    const [invoiceOrientationKinds_id, setInvoiceOrientationKinds_id] = useState();
+    useEffect(() => {
+        const item = templateView.find((el) => el.checked)?.value;
+        const value = Number(item);
+        value && setInvoiceOrientationKinds_id(value);
+    }, [templateView]);
     useEffect(() => {
         const fetch = async () => {
             const response = await getDataForCreateTtn();
@@ -81,10 +88,16 @@ function MainScreen() {
                 const res = commodityDictionary?.map((element) => {
                     return { fieldName: element.fieldName, value: element.value };
                 });
-                const ttn_max_qty = commodityDictionary[0].ttn_max_qty;
-                res.push({fieldName: "ttn_max_qty", value: ttn_max_qty});
-                res.push({fieldName: "ttn_commodity_position", value: productPosition_prev});
-                ttn_max_qty && updateCommodityDictionary(res);
+                if (response?.hasVat === 0) {
+                    res.push({ fieldName: "invoice_product_vat", value: "" });
+                    res.push({ fieldName: "invoice_product_vat_sum", value: "" });
+                    res.push({ fieldName: "product_cost_with_vat", value: "" });
+                }
+                const invoice_max_qty = commodityDictionary[0].invoice_max_qty;
+                res.push({fieldName: "invoice_max_qty", value: invoice_max_qty});
+                res.push({fieldName: "invoice_commodity_position", value: productPosition_prev});
+                res.push({fieldName: "invoice_type", value: "invoice"});
+                invoice_max_qty && updateCommodityDictionary(res);
             }
         };
         const fetch = async () => {
@@ -96,11 +109,11 @@ function MainScreen() {
                 }
                 setProductPosition(resArray);
             }
-            if (response.status === 200) {
+            if (response?.status === 200) {
                 const newCommodityDictionary = commodityDictionary?.map((element) => {
                     const value = response.data.columns[element.fieldName];
                     if (element.fieldName === "product_name") {
-                        return {...element, value: value ? value : "", ttn_max_qty: response.data.columns.ttn_max_qty || ""};
+                        return {...element, value: value ? value : "", invoice_max_qty: response.data.columns.invoice_max_qty || ""};
                     }
                     return {...element, value: value ? value : ""};
                 });
@@ -181,7 +194,7 @@ function MainScreen() {
         if (!Object.values(server_commodityDictionary).length) {
             return;
         }
-        return changeCommodity(server_commodityDictionary, fieldName, parenValue, commodityDictionary, response);
+        return changeCommodity(server_commodityDictionary, fieldName, parenValue, commodityDictionary, currency);
     };
     const changeDogovorDictionary = (fieldName, parenValue) => {
         if (!response?.dogovorDictionary) {
@@ -212,7 +225,7 @@ function MainScreen() {
     useMemo(() => expensiveCalculation(dogovorDictionary, changeDogovorDictionary, setDogovorDictionary, 3), [dogovorDictionary[3].value]);
 
     useMemo(() => {
-        if (commodityDictionary[4].value && commodityDictionary[6].value) {
+        if (commodityDictionary[4].value && commodityDictionary[6]?.value) {
             const sum = commodityDictionary[4].value + commodityDictionary[6].value;
             const resObj = commodityDictionary?.map((element) => {
                 if (element.fieldName === "product_cost_with_vat") {
@@ -225,12 +238,12 @@ function MainScreen() {
             });
             setCommodityDictionary(resObj);
         }
-    }, [commodityDictionary[4].value, commodityDictionary[6].value]);
+    }, [commodityDictionary[4]?.value, commodityDictionary[6]?.value]);
     useMemo(() => {
-        if (commodityDictionary[4].value && commodityDictionary[5].value) {
+        if (commodityDictionary[4].value && commodityDictionary[5]?.value) {
             const sum = commodityDictionary[4].value * (commodityDictionary[5].value / 100);
             const resObj = commodityDictionary?.map((element) => {
-                if (element.fieldName === "ttn_product_vat_sum") {
+                if (element.fieldName === "invoice_product_vat_sum") {
                     return {
                         ...element,
                         value: sum,
@@ -240,7 +253,7 @@ function MainScreen() {
             });
             setCommodityDictionary(resObj);
         }
-    }, [commodityDictionary[4].value, commodityDictionary[5].value]);
+    }, [commodityDictionary[4].value, commodityDictionary[5]?.value]);
     useMemo(() => {
         if (commodityDictionary[2].value && commodityDictionary[3].value) {
             const sum = commodityDictionary[2].value * commodityDictionary[3].value;
@@ -265,12 +278,18 @@ function MainScreen() {
         if (!isAll_commodityDictionary?.length) {
             const item =
                 Object.values(server_commodityDictionary?.commodityDictionary)
-                    ?.find((el) => el.product_name === commodityDictionary[0].value)?.ttnProductQty || commodityDictionary[0].ttn_max_qty;
+                    ?.find((el) => el.product_name === commodityDictionary[0].value)?.ttnProductQty || commodityDictionary[0].invoice_max_qty;
             const res = commodityDictionary?.map((element) => {
                 return { fieldName: element.fieldName, value: element.value };
             });
-            res.push({fieldName: "ttn_max_qty", value: item});
-            res.push({fieldName: "ttn_commodity_position", value: productPosition_active});
+            if (response?.hasVat === 0) {
+                res.push({ fieldName: "invoice_product_vat", value: "" });
+                res.push({ fieldName: "invoice_product_vat_sum", value: "" });
+                res.push({ fieldName: "product_cost_with_vat", value: "" });
+            }
+            res.push({fieldName: "invoice_max_qty", value: item});
+            res.push({fieldName: "invoice_commodity_position", value: productPosition_active});
+            res.push({fieldName: "invoice_type", value: "invoice"});
             setIsShowAddCommodityDictionary(true);
             setCommodityDictionary_result(res);
             return;
@@ -284,11 +303,16 @@ function MainScreen() {
         const dogovorDictionary_server = setResponseMapper(dogovorDictionary, response);
         setDogovorDictionary(dogovorDictionary_server);
         setTypesDelivery(typesDelivery_server);
-        if (response?.defaultCurrencyCode) {
-            const commodityDictionary_server = changeLabel(commodityDictionary, response.defaultCurrencyCode);
-            setCommodityDictionary(commodityDictionary_server);
-        }
     }, [response]);
+    useMemo(() => {
+        const currencyCode = response?.dogovorDictionary?.find((el) => el.doc_number === dogovorDictionary[3].value)?.currency;
+        const code = currencyCode ? getValueLabel(currencyCode) : response?.defaultCurrencyCode;
+        setCurrency(code);
+    }, [dogovorDictionary[3].value, response]);
+    useEffect(() => {
+        const items = changeLabel(commodityDictionary, currency);
+        setCommodityDictionary(items);
+    }, [currency]);
     useEffect(() => {
         const commodityDictionary_server = setResponseMapper(commodityDictionary, server_commodityDictionary);
         setCommodityDictionary(commodityDictionary_server);
@@ -321,6 +345,14 @@ function MainScreen() {
         }
     }, [step, dogovorDictionary, commodityDictionary]);
     useEffect(() => {
+        if (response?.hasVat === 0) {
+            const commodityDictionary_server = commodityDictionary.filter((el) => {
+                return el.fieldName !== "invoice_product_vat" &&  el.fieldName !== "invoice_product_vat_sum" && el.fieldName !== "product_cost_with_vat"
+            });
+            setCommodityDictionary(commodityDictionary_server);
+        }
+    }, [step]);
+    useEffect(() => {
         const isAll_dogovorDictionary = dogovorDictionary.filter((el) => el.value === "" && el.require);
         const isAll_organizationInformation = organizationInformation.filter((el) => el.value === "" && el.require);
         const isAll_personInformation = personInformation.filter((el) => el.value === "" && el.require);
@@ -328,7 +360,8 @@ function MainScreen() {
             !isAll_dogovorDictionary.length &&
             !isAll_organizationInformation.length &&
             !isAll_personInformation.length &&
-            typesDelivery_server !== ""
+            typesDelivery_server !== "" &&
+            invoiceOrientationKinds_id
             ) {
                 const dogovorDictionary_result = dogovorDictionary
                     .filter((el) => !el.header)
@@ -339,11 +372,14 @@ function MainScreen() {
                 const personInformation_result = changeMapper(personInformation);
 
                 const delivery_conditions_id = {fieldName: "deliv_cond_id", value: typesDelivery_server};
+
+                const orientationKinds_id = {fieldName: "invoiceOrientationKinds_id", value: invoiceOrientationKinds_id};
                 
                 const res = [
                     ...dogovorDictionary_result,
                     ...organizationInformation_result,
                     ...personInformation_result,
+                    orientationKinds_id,
                     delivery_conditions_id,
                 ];
                 setServerResult(res);
@@ -388,7 +424,6 @@ function MainScreen() {
             ]
             setProductPosition(newProductPosition);
             setProductPosition_active(productPosition_active + 1);
-            await showSection(1);
         }
     };
     const deleteCommodityDictionary = async () => {
@@ -400,7 +435,7 @@ function MainScreen() {
             for (let i = 0; i < response.data.sectionCount + 1; i++) {
                 resArray.push({ index: i, value: i + 1, label: i + 1 })
             }
-            if (response.status === 200) {
+            if (response?.status === 200) {
                 const newCommodityDictionary = commodityDictionary?.map((element) => {
                     const value = response.data.columns[element.fieldName];
                     return {...element, value: value ? value : ""};

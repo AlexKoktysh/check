@@ -17,7 +17,7 @@ function AutocompleteField(props) {
         switch (props.item.label) {
             case "Наименование товара":
                 const obj = props.item.controlValue;
-                const index = obj.indexOf(props.item.value);
+                const index = obj?.indexOf(props.item.value);
                 const product = props.item.value !== "" && obj ? obj.find((el) => el === props.item.value) : "";
                 if (!product) {
                     const results = {index: props.item?.index || "", label: props.item?.value || ""};

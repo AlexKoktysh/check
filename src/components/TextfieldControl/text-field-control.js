@@ -10,7 +10,7 @@ function TextFieldControl(props) {
     const changeInput = (event) => {
         let val = event.target.value;
         if (props.item.fieldName === "product_qty") {
-            const max_qty = props.commodityDictionary[0]?.currencies?.find((el) => el.label === props.commodityDictionary[0].value)?.ttn_max_qty;
+            const max_qty = props.commodityDictionary[0]?.currencies?.find((el) => el.label === props.commodityDictionary[0].value)?.invoice_max_qty;
             val = Number(event.target.value) <= Number(max_qty) ? event.target.value : max_qty;
         }
         setValue(val);

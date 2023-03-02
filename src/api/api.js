@@ -2,7 +2,14 @@ import axios from "axios";
 const token = "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NTAyOTIxMjEsIkFwcGxpY2F0aW9uIjoiUnVrb3ZvZGl0ZWwifQ.tdUIEg-hrhP2dRQHL1r6x3raC2GZ8qu0utwrTC8zUBk";
 
 const instance = axios.create({
-    baseURL: `https://portal.liloo.by/api/services/`,
+    baseURL: `https://portal.liloo.by/api/services/invoice/`,
+    headers: {
+        Authorization : `Bearer ${token}`,
+        "Access-Control-Allow-Origin": "https://portal.liloo.by/api/",
+    },
+});
+const instance_commodity = axios.create({
+    baseURL: `https://portal.liloo.by/api/services/ttn/`,
     headers: {
         Authorization : `Bearer ${token}`,
         "Access-Control-Allow-Origin": "https://portal.liloo.by/api/",
@@ -12,12 +19,16 @@ instance.interceptors.response.use(
     (response) => response,
     (error) => checkError(error)
 );
+instance_commodity.interceptors.response.use(
+    (response) => response,
+    (error) => checkError(error)
+);
 const checkError = (error) => {
     alert(error.message);
 };
 
 export const getDataForCreateTtn = async () => {
-    const response = await instance.post("get_data_for_create_ttn");
+    const response = await instance.post("get_data_for_create");
     return response.data;
 };
 
@@ -38,12 +49,12 @@ export const sendCommodityDictionary = async (params) => {
 };
 
 export const showSection = async (section) => {
-    const response = await instance.post("show_section", { "position": section });
+    const response = await instance.post("show_section", { "position": section, "invoice_type": "invoice" });
     return response;
 };
 
 export const deleteSection = async (section) => {
-    const response = await instance.post("remove_position", { "position": section });
+    const response = await instance.post("remove_position", { "position": section, "invoice_type": "invoice" });
     return response.status === 200;
 };
 
@@ -53,6 +64,6 @@ export const updateCommodityDictionary = async (params) => {
 };
 
 export const getCommodityDictionary = async (searchText) => {
-    const response = await instance.post("get_commodity_dictionary",  { filter: searchText });
+    const response = await instance_commodity.post("get_commodity_dictionary",  { filter: searchText });
     return response.data;
 };

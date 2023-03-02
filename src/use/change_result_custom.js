@@ -23,15 +23,14 @@ export const changeMapper = (items) => {
     return result;
 };
 
-export const changeCommodity = (response, fieldName, parenValue, commodityDictionary, defResponse) => {
+export const changeCommodity = (response, fieldName, parenValue, commodityDictionary, currency) => {
     const obj = Object.values(response?.commodityDictionary);
-    const defaultPrice = defResponse?.defaultCurrencyCode;
     const findItem = obj.find((el) => el.product_name === parenValue);
     let item = null;
     if (findItem) {
         item = obj.find((el) => el.product_name === parenValue)[fieldName];
         if (fieldName === "product_price") {
-            const price = item ? item[defaultPrice] : "";
+            const price = item ? item[currency] : "";
             return price ? `${price}` : "";
         }
         return item ? `${item}` : "";
