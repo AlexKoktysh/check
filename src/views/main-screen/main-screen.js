@@ -326,13 +326,16 @@ function MainScreen() {
             return {...item, value: controlValue !== "" ? response.contrAgents.find((el) => el.dog_number === controlValue)[item.server] : "", disabled: true};
         });
         const res = [
-            {name: "Информация об организации", items: organizationInformation_server},
-            {name: "Информация об уполномоченном лице", items: personInformation_server},
+            {name: "Информация об организации", items: organizationInformation_server, index: "Информация об организации"},
+            {name: "Информация об уполномоченном лице", items: personInformation_server, index: "Информация об уполномоченном лице"},
         ];
         setPersonInformation(personInformation_server);
         setOrganizationInformation(organizationInformation_server);
         setActiveFormItems(res);
     };
+    useMemo(() => {
+        setContrAgent();
+    }, [dogovorDictionary[3].value]);
     useEffect(() => {
         if (step === "1") {
             setActiveFormItems(dogovorDictionary);
@@ -356,11 +359,12 @@ function MainScreen() {
         const isAll_dogovorDictionary = dogovorDictionary.filter((el) => el.value === "" && el.require);
         const isAll_organizationInformation = organizationInformation.filter((el) => el.value === "" && el.require);
         const isAll_personInformation = personInformation.filter((el) => el.value === "" && el.require);
+        const isShowDelivery = typesDelivery_server === "1" || typesDelivery_server === "2" ? !!valueDelivery : typesDelivery_server === "3";
         if (
             !isAll_dogovorDictionary.length &&
             !isAll_organizationInformation.length &&
             !isAll_personInformation.length &&
-            typesDelivery_server !== "" &&
+            isShowDelivery &&
             invoiceOrientationKinds_id
             ) {
                 const dogovorDictionary_result = dogovorDictionary
@@ -373,6 +377,8 @@ function MainScreen() {
 
                 const delivery_conditions_id = {fieldName: "deliv_cond_id", value: typesDelivery_server};
 
+                const delivery_conditions_value = {fieldName: "deliv_cond_value", value: valueDelivery};
+
                 const orientationKinds_id = {fieldName: "invoiceOrientationKinds_id", value: invoiceOrientationKinds_id};
                 
                 const res = [
@@ -381,6 +387,7 @@ function MainScreen() {
                     ...personInformation_result,
                     orientationKinds_id,
                     delivery_conditions_id,
+                    delivery_conditions_value,
                 ];
                 setServerResult(res);
                 setIsShowSample(true);
@@ -393,6 +400,8 @@ function MainScreen() {
         personInformation,
         commodityDictionary,
         typesDelivery_server,
+        valueDelivery,
+        invoiceOrientationKinds_id,
     ]);
     const changeTemplateView = (val) => {
         const changeItem = templateView?.map((el) => {

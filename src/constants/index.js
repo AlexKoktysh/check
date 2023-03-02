@@ -25,12 +25,12 @@ export const organizationInformation_default = [
     { index: "4", value: "", label: "Наименование банка", server: "bank_name", disabled: true, require: true, fieldName: "bank_name" },
 ];
 export const personInformation_default = [
-    { index: "0", value: "", label: "Фамилия уполномоченного лица", server: "contragent_owner_last_name", disabled: true, require: true, fieldName: "contragent_owner_last_name" },
-    { index: "1", value: "", label: "Имя уполномоченного лица", server: "contragent_owner_name", disabled: true, require: true, fieldName: "contragent_owner_name" },
-    { index: "2", value: "", label: "Отчество уполномоченного лица", server: "contragent_owner_second_name", disabled: true, require: true, fieldName: "contragent_owner_second_name" },
-    { index: "3", value: "", label: "Email уполномоченного лица", server: "contragent_owner_email", disabled: true, require: false, fieldName: "contragent_owner_email" },
-    { index: "4", value: "", label: "Телефон уполномоченного лица", server: "contragent_owner_phone", disabled: true, require: false, fieldName: "contragent_owner_phone" },
-    { index: "5", value: "", label: "Адрес уполномоченного лица", server: "contragent_address", disabled: true, require: true, fieldName: "contragent_address" },
+    { index: "5", value: "", label: "Фамилия уполномоченного лица", server: "contragent_owner_last_name", disabled: true, require: true, fieldName: "contragent_owner_last_name" },
+    { index: "6", value: "", label: "Имя уполномоченного лица", server: "contragent_owner_name", disabled: true, require: true, fieldName: "contragent_owner_name" },
+    { index: "7", value: "", label: "Отчество уполномоченного лица", server: "contragent_owner_second_name", disabled: true, require: true, fieldName: "contragent_owner_second_name" },
+    { index: "8", value: "", label: "Email уполномоченного лица", server: "contragent_owner_email", disabled: true, require: false, fieldName: "contragent_owner_email" },
+    { index: "9", value: "", label: "Телефон уполномоченного лица", server: "contragent_owner_phone", disabled: true, require: false, fieldName: "contragent_owner_phone" },
+    { index: "10", value: "", label: "Адрес уполномоченного лица", server: "contragent_address", disabled: true, require: true, fieldName: "contragent_address" },
 ];
 
 export const commodityDictionary_default = [
