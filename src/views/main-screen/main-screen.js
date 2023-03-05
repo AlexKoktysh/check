@@ -52,6 +52,7 @@ function MainScreen() {
     const [valueDelivery, setValueDelivery] = useState("");
     const [currency, setCurrency] = useState(null);
     const [invoiceOrientationKinds_id, setInvoiceOrientationKinds_id] = useState();
+    const [sample_id, setSample_id] = useState(0);
     useEffect(() => {
         const item = templateView.find((el) => el.checked)?.value;
         const value = Number(item);
@@ -104,8 +105,9 @@ function MainScreen() {
             const response = await showSection(productPosition_active);
             const resArray = [...productPosition];
             if (response?.data?.sectionCount >= 1 && response.data.sectionCount + 1 > productPosition.length) {
-                for (let i = 1; i < response.data.sectionCount + 1; i++) {
-                    resArray.push({ index: i, value: i + 1, label: i + 1 })
+                for (let i = 1; i < response.data.sectionCount; i++) {
+                    const find = resArray.find((el) => el.index === i);
+                    !find && resArray.push({ index: i, value: i + 1, label: i + 1 })
                 }
                 setProductPosition(resArray);
             }
@@ -160,7 +162,14 @@ function MainScreen() {
         }));
     };
     const getNewCurrencies = async (value) => {
+        const x = commodityDictionary.map((el) => {
+            if (el.fieldName === "product_name") {
+                return {...el, value};
+            }
+            return el;
+        });
         fetchCommodity(value);
+        setCommodityDictionary(x);
     };
     const addProduct = async (item, value) => {
         const server_product = Object.values(item.controlValue);
@@ -226,12 +235,12 @@ function MainScreen() {
 
     useMemo(() => {
         if (commodityDictionary[4].value && commodityDictionary[6]?.value) {
-            const sum = commodityDictionary[4].value + commodityDictionary[6].value;
+            const sum = Number(commodityDictionary[4].value) + Number(commodityDictionary[6].value);
             const resObj = commodityDictionary?.map((element) => {
                 if (element.fieldName === "product_cost_with_vat") {
                     return {
                         ...element,
-                        value: sum,
+                        value: sum.toFixed(2),
                     };
                 }
                 return element;
@@ -241,12 +250,12 @@ function MainScreen() {
     }, [commodityDictionary[4]?.value, commodityDictionary[6]?.value]);
     useMemo(() => {
         if (commodityDictionary[4].value && commodityDictionary[5]?.value) {
-            const sum = commodityDictionary[4].value * (commodityDictionary[5].value / 100);
+            const sum = Number(commodityDictionary[4].value) * (Number(commodityDictionary[5].value) / 100);
             const resObj = commodityDictionary?.map((element) => {
                 if (element.fieldName === "invoice_product_vat_sum") {
                     return {
                         ...element,
-                        value: sum,
+                        value: sum.toFixed(2),
                     };
                 }
                 return element;
@@ -256,12 +265,12 @@ function MainScreen() {
     }, [commodityDictionary[4].value, commodityDictionary[5]?.value]);
     useMemo(() => {
         if (commodityDictionary[2].value && commodityDictionary[3].value) {
-            const sum = commodityDictionary[2].value * commodityDictionary[3].value;
+            const sum = Number(commodityDictionary[2].value) * Number(commodityDictionary[3].value);
             const resObj = commodityDictionary?.map((element) => {
                 if (element.fieldName === "product_cost") {
                     return {
                         ...element,
-                        value: sum,
+                        value: sum.toFixed(2),
                     };
                 }
                 return element;
@@ -294,6 +303,10 @@ function MainScreen() {
             setCommodityDictionary_result(res);
             return;
         }
+        const data = commodityDictionary_result.map((el) => {
+            return {...el, value: ""};
+        });
+        setCommodityDictionary_result(data);
         setIsShowAddCommodityDictionary(false);
     }, [commodityDictionary, step]);
     useEffect(() => {
@@ -360,12 +373,14 @@ function MainScreen() {
         const isAll_organizationInformation = organizationInformation.filter((el) => el.value === "" && el.require);
         const isAll_personInformation = personInformation.filter((el) => el.value === "" && el.require);
         const isShowDelivery = typesDelivery_server === "1" || typesDelivery_server === "2" ? !!valueDelivery : typesDelivery_server === "3";
+        const isAll_commodityDictionary_result = commodityDictionary_result.filter((el) => el.value === "");
         if (
             !isAll_dogovorDictionary.length &&
             !isAll_organizationInformation.length &&
             !isAll_personInformation.length &&
             isShowDelivery &&
-            invoiceOrientationKinds_id
+            invoiceOrientationKinds_id &&
+            !isAll_commodityDictionary_result.length
             ) {
                 const dogovorDictionary_result = dogovorDictionary
                     .filter((el) => !el.header)
@@ -380,6 +395,8 @@ function MainScreen() {
                 const delivery_conditions_value = {fieldName: "deliv_cond_value", value: valueDelivery};
 
                 const orientationKinds_id = {fieldName: "invoiceOrientationKinds_id", value: invoiceOrientationKinds_id};
+
+                const sample_id_obj = {fieldName: "sample_id", value: sample_id};
                 
                 const res = [
                     ...dogovorDictionary_result,
@@ -388,6 +405,8 @@ function MainScreen() {
                     orientationKinds_id,
                     delivery_conditions_id,
                     delivery_conditions_value,
+                    ...commodityDictionary_result,
+                    sample_id_obj,
                 ];
                 setServerResult(res);
                 setIsShowSample(true);
@@ -402,6 +421,7 @@ function MainScreen() {
         typesDelivery_server,
         valueDelivery,
         invoiceOrientationKinds_id,
+        commodityDictionary_result,
     ]);
     const changeTemplateView = (val) => {
         const changeItem = templateView?.map((el) => {
@@ -437,7 +457,7 @@ function MainScreen() {
     };
     const deleteCommodityDictionary = async () => {
         const res = await deleteSection(productPosition_active);
-        if (res) {
+        if (res.status && res.message !== "Удаление позиции для счета не требуется") {
             setProductPosition_active(productPosition_active);
             const response = await showSection(productPosition_active);
             const resArray = [];
@@ -452,6 +472,23 @@ function MainScreen() {
                 setCommodityDictionary(newCommodityDictionary);
             }
             setProductPosition(resArray);
+        } else {
+            if (res.message === "Удаление позиции для счета не требуется") {
+                setProductPosition_active(productPosition_active - 1);
+                const response = await showSection(productPosition_active - 1);
+                const resArray = [];
+                for (let i = 0; i < response.data.sectionCount; i++) {
+                    resArray.push({ index: i, value: i + 1, label: i + 1 })
+                }
+                if (response?.status === 200) {
+                    const newCommodityDictionary = commodityDictionary?.map((element) => {
+                        const value = response.data.columns[element.fieldName];
+                        return {...element, value: value ? value : ""};
+                    });
+                    setCommodityDictionary(newCommodityDictionary);
+                }
+                setProductPosition(resArray);
+            }
         }
     };
     const changeProductPosition_active = (value) => {

@@ -25,6 +25,7 @@ function DatePickerControl(props) {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
                 inputFormat="DD.MM.YYYY"
+                disableFuture={true}
                 value={date}
                 label={props.item.label}
                 onChange={(newValue) => change(newValue)}

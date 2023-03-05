@@ -71,7 +71,7 @@ function ActCard(props) {
                     &&
                     <Box sx={{ mb: 4, mt: 4, display: 'flex', justifyContent: 'space-between' }}>
                         <Button onClick={props.addCommodityDictionary} disabled={!props.isShowAddCommodityDictionary} color="secondary" variant="contained">Добавить</Button>
-                        <Button onClick={props.deleteCommodityDictionary} disabled={!props.isShowAddCommodityDictionary} color="secondary" variant="contained">Удалить</Button>
+                        <Button onClick={props.deleteCommodityDictionary} color="secondary" variant="contained">Удалить</Button>
                     </Box>
                 }
                 <Form label="Заполняемая секция" value={step} items={props.resSteps} change={changeStep} />

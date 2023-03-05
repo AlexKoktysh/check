@@ -5,7 +5,7 @@ export const changeDogovorDictionary_result_custom = (element) => {
         case "doc_number":
             const field_name = element.currencies?.find((el) => el.label === element.value)?.label || "";
             return { fieldName: element.fieldName, value: field_name };
-        case "check_start_date":
+        case "invoce_start_date":
             const date = moment(element.value, "YYYY-MM-DD").format("DD.MM.YYYY")
             return { fieldName: element.fieldName, value: date };
         case "doc_start_date":
@@ -35,12 +35,8 @@ export const changeCommodity = (response, fieldName, parenValue, commodityDictio
         }
         return item ? `${item}` : "";
     } else {
-        return setSaveCommodity(commodityDictionary)
+        return "";
     }
-};
-const setSaveCommodity = (items) => {
-    const obj = items?.map((element) => element);
-    return obj;
 };
 export const changeDogovor = (response, fieldName, parenValue) => {
     if (fieldName === "doc_start_date") {

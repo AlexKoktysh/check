@@ -1,6 +1,6 @@
 export const dogovorDictionary_default = [
     { index: "0", value: "", label: "Номер счета", require: true, fieldName: "docNumber" },
-    { index: "1", value: "", label: "Дата начала счета", date: true, require: true, fieldName: "check_start_date" },
+    { index: "1", value: "", label: "Дата начала счета", date: true, require: true, fieldName: "invoice_start_date" },
     { index: "2", header: "Номер договора и дата начала", require: false },
     {
         index: "3",
