@@ -2,12 +2,12 @@ import { useEffect, useState, useMemo } from "react";
 import ActCard from "../act-card/act-card.js";
 import {
     getDataForCreateTtn,
-    sendTemplate,
     sendCommodityDictionary,
     showSection,
     deleteSection,
     getCommodityDictionary,
     updateCommodityDictionary,
+    addSample,
 } from "../../api/api";
 import {
     dogovorDictionary_default,
@@ -27,8 +27,10 @@ import {
     changeMapper,
     changeDogovor,
 } from "../../use/change_result_custom.js";
+import { CircularProgress } from "@mui/material";
+import Box from '@mui/material/Box';
 
-function MainScreen() {
+function MainScreen(props) {
     const [serverResult, setServerResult] = useState([]);
     const [response, setResponse] = useState([]);
     const [step, setStep] = useState("");
@@ -52,7 +54,9 @@ function MainScreen() {
     const [valueDelivery, setValueDelivery] = useState("");
     const [currency, setCurrency] = useState(null);
     const [invoiceOrientationKinds_id, setInvoiceOrientationKinds_id] = useState();
-    const [sample_id, setSample_id] = useState(0);
+    const [sample_id, setSample_id] = useState(props.sample_id);
+    const [server_response, setServer_response] = useState(false);
+    const [loader, setLoader] = useState(false);
     useEffect(() => {
         const item = templateView.find((el) => el.checked)?.value;
         const value = Number(item);
@@ -60,8 +64,10 @@ function MainScreen() {
     }, [templateView]);
     useEffect(() => {
         const fetch = async () => {
+            setServer_response(true);
             const response = await getDataForCreateTtn();
             setResponse(response);
+            setServer_response(false);
         };
         fetch();
     }, []);
@@ -80,8 +86,10 @@ function MainScreen() {
     }, [labelDeliv]);
     useEffect(() => {
         const fetchCommodity = async () => {
+            setLoader(true);
             const response = await getCommodityDictionary("");
             setServer_commodityDictionary(response);
+            setLoader(false);
         }
         const update = () => {
             const isAll_commodityDictionary = commodityDictionary.filter((el) => !el.value && el.require);
@@ -127,8 +135,10 @@ function MainScreen() {
         fetch();
     }, [productPosition_active]);
     const fetchCommodity = async (value) => {
+        setLoader(true);
         const response = await getCommodityDictionary(value);
         setServer_commodityDictionary(response);
+        setLoader(false);
     }
     const checkStep = (changeItem, value) => {
         switch (step) {
@@ -422,6 +432,7 @@ function MainScreen() {
         valueDelivery,
         invoiceOrientationKinds_id,
         commodityDictionary_result,
+        sample_id,
     ]);
     const changeTemplateView = (val) => {
         const changeItem = templateView?.map((el) => {
@@ -434,7 +445,7 @@ function MainScreen() {
         setTemplateView(changeItem);
     };
     const clickSample = async () => {
-        await sendTemplate(serverResult);
+        props.sendTemplate(serverResult);
     };
     const changeDate = (label, value) => {
         switch (label) {
@@ -498,36 +509,52 @@ function MainScreen() {
     const changeValueDelivery = (event) => {
         setValueDelivery(event.target.value);
     };
+    const clickAdd = () => {
+        addSample(serverResult);
+    };
+    useEffect(() => {
+        setSample_id(props.sample_id);
+    }, [props.sample_id]);
 
     return (
         <div id="main-screen">
-            <ActCard
-                delivery={typesDelivery_server}
-                changeDelivery={(deliv) => setDelivery_server(deliv)}
-                changeStep={(step) => setStep(step)}
-                items={activeFormItems}
-                updatedItems={updatedItems}
-                typesDelivery={typesDelivery}
-                addProduct={addProduct}
-                addDogovor={addDogovor}
-                templateView={templateView}
-                changeTemplateView={changeTemplateView}
-                isShowSample={isShowSample}
-                clickSample={clickSample}
-                changeDate={changeDate}
-                isShowAddCommodityDictionary={isShowAddCommodityDictionary}
-                addCommodityDictionary={addCommodityDictionary}
-                productPosition={productPosition}
-                productPosition_active={productPosition_active}
-                changeProductPosition_active={changeProductPosition_active}
-                deleteCommodityDictionary={deleteCommodityDictionary}
-                getNewCurrencies={getNewCurrencies}
-                commodityDictionary={commodityDictionary}
-                labelDeliv={labelDeliv}
-                resSteps={resSteps}
-                changeValueDelivery={changeValueDelivery}
-                valueDelivery={valueDelivery}
-            />
+            {server_response &&
+                <Box sx={{ justifyContent: 'center', width: '50%' }}>
+                    <CircularProgress />
+                </Box>
+            }
+            {!server_response &&
+                <ActCard
+                    delivery={typesDelivery_server}
+                    changeDelivery={(deliv) => setDelivery_server(deliv)}
+                    changeStep={(step) => setStep(step)}
+                    items={activeFormItems}
+                    updatedItems={updatedItems}
+                    typesDelivery={typesDelivery}
+                    addProduct={addProduct}
+                    addDogovor={addDogovor}
+                    templateView={templateView}
+                    changeTemplateView={changeTemplateView}
+                    isShowSample={isShowSample}
+                    clickSample={clickSample}
+                    changeDate={changeDate}
+                    isShowAddCommodityDictionary={isShowAddCommodityDictionary}
+                    addCommodityDictionary={addCommodityDictionary}
+                    productPosition={productPosition}
+                    productPosition_active={productPosition_active}
+                    changeProductPosition_active={changeProductPosition_active}
+                    deleteCommodityDictionary={deleteCommodityDictionary}
+                    getNewCurrencies={getNewCurrencies}
+                    commodityDictionary={commodityDictionary}
+                    labelDeliv={labelDeliv}
+                    resSteps={resSteps}
+                    changeValueDelivery={changeValueDelivery}
+                    valueDelivery={valueDelivery}
+                    loader={loader}
+                    showAddButton={props.showAddButton}
+                    clickAdd={clickAdd}
+                />
+            }
         </div>
     );
 }

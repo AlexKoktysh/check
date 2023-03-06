@@ -5,11 +5,11 @@ export const changeDogovorDictionary_result_custom = (element) => {
         case "doc_number":
             const field_name = element.currencies?.find((el) => el.label === element.value)?.label || "";
             return { fieldName: element.fieldName, value: field_name };
-        case "invoce_start_date":
-            const date = moment(element.value, "YYYY-MM-DD").format("DD.MM.YYYY")
+        case "invoice_start_date":
+            const date = moment(element.value, "YYYY-MM-DD").format("DD.MM.YYYY");
             return { fieldName: element.fieldName, value: date };
         case "doc_start_date":
-            const date_new = moment(element.value, "YYYY-MM-DD").format("DD.MM.YYYY")
+            const date_new = moment(element.value, "DD.MM.YYYY").format("DD.MM.YYYY");
             return { fieldName: element.fieldName, value: date_new };
         default:
             return {fieldName: element.fieldName, value: element.value}

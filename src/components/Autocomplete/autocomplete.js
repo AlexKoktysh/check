@@ -1,6 +1,8 @@
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useEffect, useState } from 'react';
+import parse from 'autosuggest-highlight/parse';
+import match from 'autosuggest-highlight/match';
 
 function AutocompleteField(props) {
     const [label, setLabel] = useState("");
@@ -40,12 +42,34 @@ function AutocompleteField(props) {
             id="free-solo-demo"
             size="small"
             freeSolo
+            loading={props.loader}
             value={label}
             onChange={save}
             options={props.item.currencies?.map((option) => option)}
             renderInput={(params) => {
                 return <TextField {...params} label={props.item.label} onChange={newCar} />
             }}
+            renderOption={(props, option, { inputValue }) => {
+                const matches = match(option.label, inputValue, { insideWords: true });
+                const parts = parse(option.label, matches);
+        
+                return (
+                  <li {...props}>
+                    <div>
+                      {parts.map((part) => (
+                        <span
+                          key={part.text}
+                          style={{
+                            fontWeight: part.highlight ? 700 : 400,
+                          }}
+                        >
+                          {part.text}
+                        </span>
+                      ))}
+                    </div>
+                  </li>
+                );
+              }}
         />
     );
 }

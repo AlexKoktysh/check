@@ -62,6 +62,7 @@ const getCurrencies = (element, response, isControl, label, control_response) =>
 const getLabel = (element, response) => {
     return {
         ...element,
-        value: response || ""
+        value: response || "",
+        disabled: response ? true : false,
     };
 };

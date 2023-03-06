@@ -54,7 +54,7 @@ function ActCard(props) {
     };
     const listItems = step !== "2" && props.items?.map((item) =>
         !item.header
-            ? <TextFieldControl commodityDictionary={props.commodityDictionary} item={item} key={item.index} change={change} addProduct={addProduct} addDogovor={addDogovor} changeDate={changeDate} getNewCurrencies={props.getNewCurrencies} />
+            ? <TextFieldControl commodityDictionary={props.commodityDictionary} item={item} key={item.index} change={change} addProduct={addProduct} addDogovor={addDogovor} changeDate={changeDate} getNewCurrencies={props.getNewCurrencies} loader={props.loader} />
             : <div key={item.index} className="header">{item.header}</div>
     );
 
@@ -79,7 +79,7 @@ function ActCard(props) {
                     <Button onClick={props.clickSample} disabled={!props.isShowSample} color="secondary" variant="contained">Заполнить шаблон</Button>
                 </Box>
                 <Box sx={{ mb: 4 }}>
-                    <Button disabled color="secondary" variant="contained">Создать</Button>
+                    <Button disabled={!props.isShowSample && !props.showAddButton} onClick={props.clickAdd} color="secondary" variant="contained">Создать</Button>
                 </Box>
             </div>
         </div>
