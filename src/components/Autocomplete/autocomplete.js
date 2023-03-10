@@ -45,6 +45,7 @@ function AutocompleteField(props) {
             loading={props.loader}
             value={label}
             onChange={save}
+            loadingText={"Загрузка"}
             options={props.item.currencies?.map((option) => option)}
             renderInput={(params) => {
                 return <TextField {...params} label={props.item.label} onChange={newCar} />

@@ -461,8 +461,15 @@ function MainScreen(props) {
             const newProductPosition = [
                 ...productPosition,
                 { index: productPosition_active, value: productPosition_active + 1, label: productPosition_active + 1 },
-            ]
-            setProductPosition(newProductPosition);
+            ];
+            const { arr: filtered } = newProductPosition.reduce((acc, elem) => {
+                if (!acc.unique[elem.value]) {
+                   acc.unique[elem.value] = true;
+                   acc.arr.push(elem);
+                }
+                return acc;
+             }, { arr: [], unique: {} });
+            setProductPosition(filtered);
             setProductPosition_active(productPosition_active + 1);
         }
     };

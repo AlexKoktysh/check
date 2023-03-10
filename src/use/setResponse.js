@@ -1,3 +1,5 @@
+import { commodityDictionary_default } from "../constants";
+
 export const setResponseMapper = (items, response) => {
     const result = items?.map((element) => setResponse_custom(element, response));
     return result;
@@ -7,13 +9,13 @@ export const changeLabel = (items, value) => {
         const element_name = element.fieldName;
         switch (element_name) {
             case "product_price":
-                return {...element, label: `${element.label} ${value}`};
+                return {...element, label: `${commodityDictionary_default[3].label} ${value}`};
             case "product_cost":
-                return {...element, label: `${element.label} ${value}`};
+                return {...element, label: `${commodityDictionary_default[4].label} ${value}`};
             case "invoice_product_vat_sum":
-                return {...element, label: `${element.label} ${value}`};
+                return {...element, label: `${commodityDictionary_default[6].label} ${value}`};
             case "product_cost_with_vat":
-                return {...element, label: `${element.label} ${value}`};
+                return {...element, label: `${commodityDictionary_default[7].label} ${value}`};
             default:
                 return element;
         }
