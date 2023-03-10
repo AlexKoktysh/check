@@ -38,7 +38,8 @@ export const sendTemplate = async (params) => {
 
 export const addSample = async (params) => {
     const json = {...params};
-    console.log(json);
+    const response = await instance.post("create", json);
+    return response.data;
 };
 
 export const sendCommodityDictionary = async (params) => {

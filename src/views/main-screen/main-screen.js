@@ -290,7 +290,7 @@ function MainScreen(props) {
     }, [commodityDictionary[2].value, commodityDictionary[3].value]);
 
     useEffect(() => {
-        if (!server_commodityDictionary?.commodityDictionary && step !== "3") {
+        if (!server_commodityDictionary?.commodityDictionary) {
             return;
         }
         const isAll_commodityDictionary = commodityDictionary.filter((el) => !el.value && el.require);
@@ -516,8 +516,11 @@ function MainScreen(props) {
     const changeValueDelivery = (event) => {
         setValueDelivery(event.target.value);
     };
-    const clickAdd = () => {
-        addSample(serverResult);
+    const clickAdd = async () => {
+        const response = await addSample(serverResult);
+        if (response["ajax-response"] === "Счет успешно сохранен") {
+            window.location.reload();
+        }
     };
     useEffect(() => {
         setSample_id(props.sample_id);
