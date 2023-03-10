@@ -520,6 +520,8 @@ function MainScreen(props) {
         const response = await addSample(serverResult);
         if (response["ajax-response"] === "Счет успешно сохранен") {
             window.location.reload();
+        } else {
+            alert("Проверьте правильность заполненных полей");
         }
     };
     useEffect(() => {
