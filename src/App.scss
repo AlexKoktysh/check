@@ -5,4 +5,17 @@
   align-items: center;
   justify-content: space-around;
   text-align: center;
+  .button {
+    position: fixed;
+    top: 0;
+    right: 0;
+  }
+  .right {
+    position: absolute;
+    left: 0;
+  }
+  .left {
+    position: absolute;
+    right: 0;
+  }
 }

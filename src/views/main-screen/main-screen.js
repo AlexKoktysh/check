@@ -14,7 +14,6 @@ import {
     organizationInformation_default,
     commodityDictionary_default,
     personInformation_default,
-    templateViewField,
     steps,
 } from "../../constants/index.js";
 import "./main-screen.scss";
@@ -41,7 +40,7 @@ function MainScreen(props) {
     const [organizationInformation, setOrganizationInformation] = useState(organizationInformation_default);
     const [personInformation, setPersonInformation] = useState(personInformation_default);
     const [commodityDictionary, setCommodityDictionary] = useState(commodityDictionary_default);
-    const [templateView, setTemplateView] = useState(templateViewField);
+    const [templateView, setTemplateView] = useState([]);
     const [isShowSample, setIsShowSample] = useState(false);
     const [isShowAddCommodityDictionary, setIsShowAddCommodityDictionary] = useState(false);
     const [commodityDictionary_result, setCommodityDictionary_result] = useState([]);
@@ -323,6 +322,8 @@ function MainScreen(props) {
         const typesDelivery_server = response.deliveryConditions?.map((el, index) => {
             return { index: index, label: el.label, value: index + 1 };
         });
+        const templateView_server = response?.invoiceOrientationKinds?.map((el) => el) || [];
+        setTemplateView(templateView_server);
         const dogovorDictionary_server = setResponseMapper(dogovorDictionary, response);
         setDogovorDictionary(dogovorDictionary_server);
         setTypesDelivery(typesDelivery_server);
